@@ -140,12 +140,6 @@ def compute_local_embeddings(
     return local_embeddings
 
 
-from typing import Dict, List, Tuple
-
-
-from typing import Dict, List, Tuple
-
-
 def select_pivot_patches(
     patches: Dict[int, Tuple[List[int], object]]
 ) -> List[int]:
@@ -197,7 +191,30 @@ def procrustes(
     X_ref: np.ndarray,
     X: np.ndarray,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    pass
+
+    if X_ref.shape != X.shape:
+        raise ValueError("X_ref and X must have the same shape.")
+
+    mu_ref = X_ref.mean(axis=0)
+    mu = X.mean(axis=0)
+
+    X_ref_c = X_ref - mu_ref
+    X_c = X - mu
+
+    C = X_c.T @ X_ref_c
+    U, _, Vt = np.linalg.svd(C)
+    R = U @ Vt
+
+    if np.linalg.det(R) < 0:
+        Vt[-1, :] *= -1
+        R = U @ Vt
+
+    t = mu_ref - mu @ R
+
+    X_aligned = X @ R + t
+
+    return X_aligned, R, t
+
 
 
 def align_patches(
