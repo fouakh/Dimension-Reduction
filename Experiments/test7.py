@@ -35,7 +35,7 @@ def main() -> None:
     graph = Graph()
     graph.build_synth_graph(
         X=X_background,
-        k=10,
+        k=8,
         sigma=0.04,
         seed=0
     )
@@ -81,7 +81,18 @@ def main() -> None:
 
         overlap = list(set(patch_nodes) & embedded)
 
-        if len(overlap) < dim :
+        if len(overlap) == 0:
+            
+            D = mds_d(A, patch_nodes)
+            X_init = classical_scaling(D, dim)
+            X_local = smacof(D, X_init)
+
+            debug.first_patch_embedding(X_local)
+
+            for i, node in enumerate(patch_nodes):
+                global_X[node] = X_local[i]
+
+            embedded.update(patch_nodes)
             continue
 
         # ---------------------------

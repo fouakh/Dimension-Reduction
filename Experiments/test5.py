@@ -7,29 +7,29 @@ from Shapes.CShape import CShape
 from Graphs.Graphs import Graph
 
 from Algorithms.mdsmapp import (
-    compute_local_embeddings,
-    select_pivot_patches
+    build_csr,
+    build_patch,
+    list_pivots
 )
 
 from Plots.PlotPatchesProgression import PlotPatchesProgression
 
 
-def main():
+def main() -> None:
 
     shapes = [
         Rectangle(nx=40, ny=40, jitter=0.05, seed=0),
         CShape(nx=40, ny=40, inner_margin_x=10, inner_margin_y=10, jitter=0.1, seed=2)
     ]
 
-    ordered_centers_list = []
-    patches_list = []
+    ordered_centers_list: list[list[int]] = []
+    patches_list: list[dict[int, dict[int, list[int]]]] = []
 
-    h = 5
-    dim = 2
+    h: int = 5
 
     for shape in shapes:
 
-        X = shape.samples()
+        X: np.ndarray = shape.samples()
 
         graph = Graph()
         graph.build_synth_graph(
@@ -39,17 +39,18 @@ def main():
             seed=0
         )
 
-        local_embeddings = compute_local_embeddings(
-            graph=graph,
-            h=h,
-            dim=dim,
-            use_smacof=False
-        )
+        A = build_csr(graph)
 
-        ordered_centers = select_pivot_patches(local_embeddings)
+        n = A.shape[0]
+        patches = {}
+
+        for v in range(n):
+            patches[v] = build_patch(A, v, h)
+
+        ordered_centers = list_pivots(A, h)
 
         ordered_centers_list.append(ordered_centers)
-        patches_list.append(local_embeddings)
+        patches_list.append(patches)
 
     plotter = PlotPatchesProgression(
         shapes=shapes,
@@ -58,9 +59,11 @@ def main():
         grid=(1, 2)
     )
 
-    plotter.plot(figsize=(12, 5), point_size=12)
+    plotter.plot(figsize=(12, 5), point_size=32)
     plt.show()
 
 
 if __name__ == "__main__":
     main()
+
+

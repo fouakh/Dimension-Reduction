@@ -9,7 +9,7 @@ from Shapes.HShape import HShape
 from Graphs.Graphs import Graph
 from Plots.PlotDistanceError import PlotDistanceError
 
-from Algorithms.mdsmapp import mds_d
+from Algorithms.mdsmapp import build_csr, mds_d
 
 
 def true_distance_matrix(X):
@@ -44,8 +44,10 @@ def main():
 
         graphs.append(graph)
 
-        D_true = true_distance_matrix(X)
-        D_hat = mds_d(graph, list(graph.nodes()))
+        A = build_csr(graph)
+
+        D_true: np.ndarray = true_distance_matrix(X)
+        D_hat: np.ndarray = mds_d(A, list(graph.nodes()))
 
         D_true_list.append(D_true)
         D_hat_list.append(D_hat)
