@@ -18,7 +18,7 @@ from Plots.PlotMDSMAPPDebug import PlotMDSMAPPDebug
 
 def main() -> None:
 
-    h = 7
+    h = 3
     dim = 2
 
     shape = CShape(
@@ -44,10 +44,7 @@ def main() -> None:
 
     n = A.shape[0]
 
-    patches = {}
-    for v in range(n):
-        patches[v] = build_patch(A, v, h)[v]
-
+    patches = {v: build_patch(A, v, h)[v] for v in range(n)}
     ordered_pivots = list_pivots(A, h)
 
     debug = PlotMDSMAPPDebug(X_background)
@@ -55,8 +52,7 @@ def main() -> None:
     global_X = np.zeros((n, dim))
     embedded = set()
 
-    # --------------------------------------------------
-
+    # First patch
     first = ordered_pivots[0]
     patch_nodes = patches[first]
 
@@ -73,26 +69,21 @@ def main() -> None:
 
     embedded.update(patch_nodes)
 
-    # --------------------------------------------------
-
+    # Remaining pivots
     for pivot in ordered_pivots[1:]:
 
         patch_nodes = patches[pivot]
 
-        overlap = list(set(patch_nodes) & embedded)
+        overlap = [v for v in patch_nodes if v in embedded]
 
-        if len(overlap) < dim :
+        if len(overlap) < dim:
             continue
-
-        # ---------------------------
 
         debug.new_patch_initial_position(
             global_X,
             patch_nodes,
             overlap
         )
-
-        # ---------------------------
 
         D = mds_d(A, patch_nodes)
         X_init = classical_scaling(D, dim)
@@ -107,12 +98,10 @@ def main() -> None:
             idx_local
         )
 
-        # ---------------------------
+        X_ref = global_X[overlap]
+        X_overlap = X_local[idx_local]
 
-        X_global_overlap = global_X[overlap]
-        X_local_overlap = X_local[idx_local]
-
-        R, t = procrustes(X_global_overlap, X_local_overlap)
+        R, t = procrustes(X_ref, X_overlap)
         X_aligned = X_local @ R + t
 
         debug.after_procrustes(

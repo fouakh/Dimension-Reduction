@@ -26,30 +26,27 @@ class PlotMDSMAPPDebug:
             self.X_background[:, 1],
             color="lightgray",
             alpha=0.35,
-            s=15
+            s=10
         )
         ax.set_aspect("equal")
         ax.axis("off")
         return fig, ax
 
-    # ----------------------------------------------------
-    # 1 - First patch highlighted
-    # ----------------------------------------------------
+    # 1
     def first_patch(self, patch_nodes):
         fig, ax = self._base_ax()
 
         ax.scatter(
             self.X_background[patch_nodes, 0],
             self.X_background[patch_nodes, 1],
-            color="red",
-            s=25
+            color="blue",
+            alpha=0.65,
+            s=10
         )
 
         self._save(fig, "01_first_patch_highlight")
 
-    # ----------------------------------------------------
-    # 2 - First patch embedded (MDS+SMACOF result)
-    # ----------------------------------------------------
+    # 2
     def first_patch_embedding(self, X_local):
         fig, ax = self._base_ax()
 
@@ -57,73 +54,55 @@ class PlotMDSMAPPDebug:
             X_local[:, 0],
             X_local[:, 1],
             color="blue",
-            s=25
+            alpha=0.65,
+            s=10
         )
 
         self._save(fig, "02_first_patch_embedding")
 
-    # ----------------------------------------------------
-    # 3 - New patch before alignment
-    # ----------------------------------------------------
-    def new_patch_before_alignment(
+    # 3 — new patch in ORIGINAL position
+    def new_patch_initial_position(
         self,
         X_global,
-        X_local,
-        overlap_global,
-        overlap_local
+        patch_nodes,
+        overlap_nodes
     ):
         fig, ax = self._base_ax()
 
-        # previous embedded
+        # already embedded
         ax.scatter(
             X_global[:, 0],
             X_global[:, 1],
             color="blue",
-            s=25
+            alpha=0.65,
+            s=10
         )
 
-        # new local patch
+        # new patch in original space
+        X_new = self.X_background[patch_nodes]
         ax.scatter(
-            X_local[:, 0],
-            X_local[:, 1],
-            color="orange",
-            s=25
-        )
-
-        # overlap highlighted
-        ax.scatter(
-            overlap_global[:, 0],
-            overlap_global[:, 1],
-            color="green",
-            s=35
+            X_new[:, 0],
+            X_new[:, 1],
+            color="red",
+            alpha=0.65,
+            s=10
         )
 
         # links
-        for g, l in zip(overlap_global, overlap_local):
-            ax.plot(
-                [g[0], l[0]],
-                [g[1], l[1]],
-                color="black",
-                linewidth=1
-            )
+        for node in overlap_nodes:
+            g = X_global[node]
+            l = self.X_background[node]
+            ax.plot([g[0], l[0]], [g[1], l[1]], color="black", linewidth=0.5)
 
-        self._save(fig, "03_new_patch_before_alignment")
+        self._save(fig, "03_new_patch_original_position")
 
-    # ----------------------------------------------------
-    # 4 - After local MDS+SMACOF (still unaligned)
-    # ----------------------------------------------------
-    def new_patch_after_mds(self, *args):
-        self.new_patch_before_alignment(*args)
-
-    # ----------------------------------------------------
-    # 5 - After Procrustes alignment
-    # ----------------------------------------------------
-    def after_alignment(
+    # 4 — after MDS (not aligned)
+    def new_patch_after_mds(
         self,
         X_global,
-        X_aligned,
-        overlap_global,
-        overlap_aligned
+        X_local,
+        overlap_nodes,
+        idx_local
     ):
         fig, ax = self._base_ax()
 
@@ -131,29 +110,54 @@ class PlotMDSMAPPDebug:
             X_global[:, 0],
             X_global[:, 1],
             color="blue",
-            s=25
+            alpha=0.65,
+            s=10
+        )
+
+        ax.scatter(
+            X_local[:, 0],
+            X_local[:, 1],
+            color="red",
+            alpha=0.65,
+            s=10
+        )
+
+        for k, node in enumerate(overlap_nodes):
+            g = X_global[node]
+            l = X_local[idx_local[k]]
+            ax.plot([g[0], l[0]], [g[1], l[1]], color="black", linewidth=0.5)
+
+        self._save(fig, "04_new_patch_after_mds")
+
+    # 5 — after Procrustes
+    def after_procrustes(
+        self,
+        X_global,
+        X_aligned,
+        overlap_nodes,
+        idx_local
+    ):
+        fig, ax = self._base_ax()
+
+        ax.scatter(
+            X_global[:, 0],
+            X_global[:, 1],
+            color="blue",
+            alpha=0.65,
+            s=10
         )
 
         ax.scatter(
             X_aligned[:, 0],
             X_aligned[:, 1],
-            color="purple",
-            s=25
-        )
-
-        ax.scatter(
-            overlap_global[:, 0],
-            overlap_global[:, 1],
             color="green",
-            s=35
+            alpha=0.65,
+            s=10
         )
 
-        for g, l in zip(overlap_global, overlap_aligned):
-            ax.plot(
-                [g[0], l[0]],
-                [g[1], l[1]],
-                color="black",
-                linewidth=1
-            )
+        for k, node in enumerate(overlap_nodes):
+            g = X_global[node]
+            l = X_aligned[idx_local[k]]
+            ax.plot([g[0], l[0]], [g[1], l[1]], color="black", linewidth=0.5)
 
-        self._save(fig, "04_after_procrustes")
+        self._save(fig, "05_after_procrustes")

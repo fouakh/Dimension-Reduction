@@ -97,12 +97,11 @@ def select_patch(
     patches: Dict[int, List[int]],
     mapped_nodes: Set[int],
     used_centers: Set[int],
-    alpha: float = 1.0,
-    beta: float = 2.0,
+    alpha: float = 0.4
 ) -> int:
 
     best_center = None
-    best_score = -1.0
+    best_score = -np.inf
 
     for center, nodes in patches.items():
 
@@ -117,7 +116,10 @@ def select_patch(
         if unmapped == 0:
             continue
 
-        score = alpha * overlap + beta * unmapped
+        score = (
+            alpha * np.log(overlap + 1) +
+            (1 - alpha) * np.log(unmapped + 1)
+        )
 
         if score > best_score:
             best_score = score
@@ -176,10 +178,6 @@ def procrustes(
     C = X_c.T @ X_ref_c
     U, _, Vt = np.linalg.svd(C)
     R = U @ Vt
-
-    # if np.linalg.det(R) < 0:
-    #     Vt[-1, :] *= -1
-    #     R = U @ Vt
 
     t = mu_ref - mu @ R
 
@@ -263,19 +261,19 @@ def mds_mapp(
         dim=dim
     )
 
-    # D_full = dijkstra(
-    #     csgraph=A,
-    #     directed=False
-    # )
+    D_full = dijkstra(
+        csgraph=A,
+        directed=False
+    )
 
-    # D_full = 0.5 * (D_full + D_full.T)
+    D_full = 0.5 * (D_full + D_full.T)
 
-    # X_refined = smacof(
-    #     D_full,
-    #     X,
-    #     max_iter=1,
-    #     tol=1e-4
-    # )
+    X_refined = smacof(
+        D_full,
+        X,
+        max_iter=1,
+        tol=1e-4
+    )
 
-    return X
-    # return X_refined
+    # return X
+    return X_refined
