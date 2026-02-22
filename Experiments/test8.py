@@ -10,13 +10,13 @@ from Plots.PlotEmbedding import PlotEmbeddingComparison
 
 def main() -> None:
     dim = 2
-    h_values = [1, 2, 3, 5, 10]  
+    h_values = [2, 3, 5, 7]  
 
     shape = CShape(
-        nx=40,
-        ny=40,
-        inner_margin_x=15,
-        inner_margin_y=15,
+        nx=30,
+        ny=30,
+        inner_margin_x=10,
+        inner_margin_y=10,
         jitter=0.1,
         seed=1,
     )

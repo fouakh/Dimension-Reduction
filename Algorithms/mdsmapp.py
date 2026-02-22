@@ -261,19 +261,19 @@ def mds_mapp(
         dim=dim
     )
 
-    D_full = dijkstra(
-        csgraph=A,
-        directed=False
-    )
+    # D_full = dijkstra(
+    #     csgraph=A,
+    #     directed=False
+    # )
 
-    D_full = 0.5 * (D_full + D_full.T)
+    # D_full = 0.5 * (D_full + D_full.T)
 
-    X_refined = smacof(
-        D_full,
-        X,
-        max_iter=1,
-        tol=1e-4
-    )
+    # X_refined = smacof(
+    #     D_full,
+    #     X,
+    #     max_iter=1,
+    #     tol=1e-4
+    # )
 
-    # return X
-    return X_refined
+    return X
+    # return X_refined
