@@ -277,3 +277,30 @@ def mds_mapp(
 
     return X
     # return X_refined
+
+
+def compute_s_stress(
+    X_true: np.ndarray,
+    X_emb: np.ndarray,
+    normalized: bool = True
+) -> float:
+
+    diff_true = X_true[:, None, :] - X_true[None, :, :]
+    D_true2 = np.sum(diff_true ** 2, axis=2)
+
+    diff_emb = X_emb[:, None, :] - X_emb[None, :, :]
+    D_emb2 = np.sum(diff_emb ** 2, axis=2)
+
+    i_upper = np.triu_indices_from(D_true2, k=1)
+
+    delta2 = D_true2[i_upper]
+    d_hat2 = D_emb2[i_upper]
+
+    stress = np.sum((delta2 - d_hat2) ** 2)
+
+    if normalized:
+        denom = np.sum(delta2 ** 2)
+        if denom > 0:
+            stress = stress / denom
+
+    return stress

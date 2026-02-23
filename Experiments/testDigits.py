@@ -16,7 +16,7 @@ def main() -> None:
 
     dim = 2
     k = 30
-    h = 4
+    h = 5
 
     print("Loading Digits dataset...")
     digits = load_digits()
@@ -44,16 +44,13 @@ def main() -> None:
     print("Running MDS-MAP...")
     X_emb = mds_mapp(A, h=h, dim=dim)
 
-    stress = compute_s_stress(X, X_emb, normalized=True)
-    print(f"S-stress (normalized) = {stress:.6f}")
-
     plt.figure(figsize=(8, 6))
 
     scatter = plt.scatter(
         X_emb[:, 0],
         X_emb[:, 1],
         c=y,
-        cmap="tab10",
+        cmap="Set1",
         s=25,
         alpha=0.85,
         edgecolors="none"
