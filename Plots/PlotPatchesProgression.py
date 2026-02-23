@@ -1,14 +1,31 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
+from datetime import datetime
+
 
 class PlotPatchesProgression:
 
     def __init__(self, shapes, ordered_centers_list, patches_list, grid=(1, 1)):
+
         self.shapes = shapes
         self.ordered_centers_list = ordered_centers_list
         self.patches_list = patches_list
         self.grid = grid
+
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
+
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def plot(self, figsize=(10, 6), point_size=10):
 
@@ -81,5 +98,11 @@ class PlotPatchesProgression:
         for ax in axes[len(self.shapes):]:
             ax.axis("off")
 
-        plt.tight_layout()
-        return fig, axes
+        fig.tight_layout()
+
+        fig.savefig(
+            os.path.join(self.save_dir, "patches_progression.png"),
+            dpi=200
+        )
+
+        plt.close(fig)

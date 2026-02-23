@@ -1,14 +1,27 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 
 class PlotMDSMAPPDebug:
 
     def __init__(self, X_background: np.ndarray):
         self.X_background = X_background
-        self.save_dir = "figs"
+
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
+
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
         os.makedirs(self.save_dir, exist_ok=True)
+
         self.step = 0
 
     def _save(self, fig, name: str):
@@ -32,7 +45,6 @@ class PlotMDSMAPPDebug:
         ax.axis("off")
         return fig, ax
 
-    # 1
     def first_patch(self, patch_nodes):
         fig, ax = self._base_ax()
 
@@ -46,7 +58,6 @@ class PlotMDSMAPPDebug:
 
         self._save(fig, "01_first_patch_highlight")
 
-    # 2
     def first_patch_embedding(self, X_local):
         fig, ax = self._base_ax()
 
@@ -60,7 +71,6 @@ class PlotMDSMAPPDebug:
 
         self._save(fig, "02_first_patch_embedding")
 
-    # 3 — new patch in ORIGINAL position
     def new_patch_initial_position(
         self,
         X_global,
@@ -69,7 +79,6 @@ class PlotMDSMAPPDebug:
     ):
         fig, ax = self._base_ax()
 
-        # already embedded
         ax.scatter(
             X_global[:, 0],
             X_global[:, 1],
@@ -78,7 +87,6 @@ class PlotMDSMAPPDebug:
             s=10
         )
 
-        # new patch in original space
         X_new = self.X_background[patch_nodes]
         ax.scatter(
             X_new[:, 0],
@@ -88,7 +96,6 @@ class PlotMDSMAPPDebug:
             s=10
         )
 
-        # links
         for node in overlap_nodes:
             g = X_global[node]
             l = self.X_background[node]
@@ -96,7 +103,6 @@ class PlotMDSMAPPDebug:
 
         self._save(fig, "03_new_patch_original_position")
 
-    # 4 — after MDS (not aligned)
     def new_patch_after_mds(
         self,
         X_global,
@@ -129,7 +135,6 @@ class PlotMDSMAPPDebug:
 
         self._save(fig, "04_new_patch_after_mds")
 
-    # 5 — after Procrustes
     def after_procrustes(
         self,
         X_global,

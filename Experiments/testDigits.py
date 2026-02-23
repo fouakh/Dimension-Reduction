@@ -15,7 +15,7 @@ from Algorithms.mdsmapp import (
 def main() -> None:
 
     dim = 2
-    k = 30
+    k = 50
     h = 5
 
     print("Loading Digits dataset...")

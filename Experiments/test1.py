@@ -18,14 +18,13 @@ def main():
         HShape(nx=20, ny=20, inner_margin_x=5, inner_margin_y=7, jitter=0.1, seed=3)
     ]
 
-    # plotter = PlotPoints(
-    #     shapes=shapes,
-    #     colors=["black", "red", "blue", "green"],
-    #     grid=(2, 2)
-    # )
+    plotter = PlotPoints(
+        shapes=shapes,
+        colors=["black", "red", "blue", "green"],
+        grid=(2, 2)
+    )
 
-    # plotter.plot(figsize=(10, 8), point_size=8)
-    # plt.show()
+    plotter.plot(figsize=(10, 8), point_size=8)
 
     graphs = []
     for shape in shapes:
@@ -51,7 +50,6 @@ def main():
     )
 
     graph_plotter.plot(figsize=(10, 8))
-    plt.show()
 
 
 if __name__ == "__main__":

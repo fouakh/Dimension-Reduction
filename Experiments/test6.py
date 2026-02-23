@@ -47,7 +47,6 @@ def main() -> None:
     )
 
     plotter.plot(figsize=(10, 4), point_size=15)
-    plt.show()
 
 
 if __name__ == "__main__":

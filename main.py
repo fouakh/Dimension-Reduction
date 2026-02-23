@@ -15,8 +15,8 @@ from Algorithms.mdsmapp import (
 def main() -> None:
 
     dim = 2
-    k = 30
-    h = 4
+    k = 100
+    h = 10
 
     print("Loading Digits dataset...")
     digits = load_digits()
@@ -43,9 +43,6 @@ def main() -> None:
 
     print("Running MDS-MAP...")
     X_emb = mds_mapp(A, h=h, dim=dim)
-
-    stress = compute_s_stress(X, X_emb, normalized=True)
-    print(f"S-stress (normalized) = {stress:.6f}")
 
     plt.figure(figsize=(8, 6))
 

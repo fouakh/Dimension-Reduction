@@ -60,8 +60,6 @@ def main() -> None:
     )
 
     plotter.plot(figsize=(12, 5), point_size=32)
-    plt.show()
-
 
 if __name__ == "__main__":
     main()

@@ -1,25 +1,42 @@
+import os
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 
 class PlotEmbeddingComparison:
+
     def __init__(self, shapes, embeddings, colors=None, grid=(1, 1)):
+
+        if len(shapes) != len(embeddings):
+            raise ValueError("Shapes and embeddings must have same length.")
+
+        if colors is not None and len(colors) != len(shapes):
+            raise ValueError("Number of colors must match number of shapes.")
+
+        n_rows, n_cols = grid
+        if n_rows * n_cols < len(shapes):
+            raise ValueError("Grid too small for number of shapes.")
+
         self.shapes = shapes
         self.embeddings = embeddings
         self.colors = colors
         self.grid = grid
 
-        if len(self.shapes) != len(self.embeddings):
-            raise ValueError("Shapes and embeddings must have same length.")
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
 
-        if self.colors is not None:
-            if len(self.colors) != len(self.shapes):
-                raise ValueError("Number of colors must match number of shapes.")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
 
-        n_rows, n_cols = self.grid
-        if n_rows * n_cols < len(self.shapes):
-            raise ValueError("Grid too small for number of shapes.")
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def plot(self, figsize=(8, 6), point_size=10):
+
         n_rows, n_cols = self.grid
         fig, axes = plt.subplots(n_rows, n_cols, figsize=figsize)
 
@@ -57,5 +74,11 @@ class PlotEmbeddingComparison:
         for ax in axes[len(self.shapes):]:
             ax.axis("off")
 
-        plt.tight_layout()
-        return fig, axes
+        fig.tight_layout()
+
+        fig.savefig(
+            os.path.join(self.save_dir, "embedding_comparison.png"),
+            dpi=200
+        )
+
+        plt.close(fig)

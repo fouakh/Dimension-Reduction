@@ -1,20 +1,37 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 
 class PlotDistanceError:
+
     def __init__(self, shapes, D_true_list, D_hat_list, grid=(1, 1)):
+
+        if len(shapes) != len(D_true_list) or len(shapes) != len(D_hat_list):
+            raise ValueError("Shapes and distance lists must have same length.")
+
+        n_rows, n_cols = grid
+        if n_rows * n_cols < len(shapes):
+            raise ValueError("Grid too small for number of shapes.")
+
         self.shapes = shapes
         self.D_true_list = D_true_list
         self.D_hat_list = D_hat_list
         self.grid = grid
 
-        if len(shapes) != len(D_true_list) or len(shapes) != len(D_hat_list):
-            raise ValueError("Shapes and distance lists must have same length.")
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
 
-        n_rows, n_cols = self.grid
-        if n_rows * n_cols < len(self.shapes):
-            raise ValueError("Grid too small for number of shapes.")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
+
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def _compute_point_error(self, D_true, D_hat):
         diff = D_hat - D_true
@@ -22,6 +39,7 @@ class PlotDistanceError:
         return rms
 
     def plot(self, figsize=(8, 6), point_size=15):
+
         n_rows, n_cols = self.grid
         fig, axes = plt.subplots(n_rows, n_cols, figsize=figsize)
 
@@ -29,14 +47,16 @@ class PlotDistanceError:
 
         cmap = plt.cm.get_cmap("RdYlGn_r")
 
-        all_errors = []
-        for D_true, D_hat in zip(self.D_true_list, self.D_hat_list):
-            all_errors.append(self._compute_point_error(D_true, D_hat))
+        all_errors = [
+            self._compute_point_error(D_true, D_hat)
+            for D_true, D_hat in zip(self.D_true_list, self.D_hat_list)
+        ]
 
         global_min = min(err.min() for err in all_errors)
         global_max = max(err.max() for err in all_errors)
 
         for ax, shape, error in zip(axes, self.shapes, all_errors):
+
             X = shape.samples()
 
             sc = ax.scatter(
@@ -55,5 +75,9 @@ class PlotDistanceError:
         for ax in axes[len(self.shapes):]:
             ax.axis("off")
 
-        return fig, axes
+        fig.savefig(
+            os.path.join(self.save_dir, "distance_error.png"),
+            dpi=200
+        )
 
+        plt.close(fig)

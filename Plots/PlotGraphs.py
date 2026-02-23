@@ -1,8 +1,10 @@
+import os
 import matplotlib.pyplot as plt
-import numpy as np
+from datetime import datetime
 
 
 class PlotGraphs:
+
     def __init__(
         self,
         graphs,
@@ -14,6 +16,11 @@ class PlotGraphs:
         point_size=5,
         point_color="black",
     ):
+
+        n_rows, n_cols = grid
+        if n_rows * n_cols < len(graphs):
+            raise ValueError("Grid too small for number of graphs.")
+
         self.graphs = graphs
         self.grid = grid
         self.edge_color = edge_color
@@ -23,17 +30,28 @@ class PlotGraphs:
         self.point_size = point_size
         self.point_color = point_color
 
-        n_rows, n_cols = grid
-        if n_rows * n_cols < len(graphs):
-            raise ValueError("Grid too small for number of graphs.")
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
+
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def plot(self, figsize=(10, 8)):
+
         n_rows, n_cols = self.grid
         fig, axes = plt.subplots(n_rows, n_cols, figsize=figsize)
 
         axes = axes.flatten() if n_rows * n_cols > 1 else [axes]
 
         for ax, graph in zip(axes, self.graphs):
+
             X = graph.X
 
             for i, j in graph.edges():
@@ -61,5 +79,11 @@ class PlotGraphs:
         for ax in axes[len(self.graphs):]:
             ax.axis("off")
 
-        plt.tight_layout()
-        return fig, axes
+        fig.tight_layout()
+
+        fig.savefig(
+            os.path.join(self.save_dir, "graphs.png"),
+            dpi=200
+        )
+
+        plt.close(fig)

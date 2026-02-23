@@ -1,22 +1,40 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime
 
 
 class PlotPatches:
+
     def __init__(self, shapes, patches, centers, grid=(1, 1)):
+
+        if not (len(shapes) == len(patches) == len(centers)):
+            raise ValueError("Shapes, patches, and centers must have same length.")
+
+        n_rows, n_cols = grid
+        if n_rows * n_cols < len(shapes):
+            raise ValueError("Grid too small for number of patches.")
+
         self.shapes = shapes
         self.patches = patches
         self.centers = centers
         self.grid = grid
 
-        if not (len(shapes) == len(patches) == len(centers)):
-            raise ValueError("Shapes, patches, and centers must have same length.")
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
 
-        n_rows, n_cols = self.grid
-        if n_rows * n_cols < len(self.shapes):
-            raise ValueError("Grid too small for number of patches.")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
+
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def plot(self, figsize=(8, 6), point_size=15):
+
         n_rows, n_cols = self.grid
         fig, axes = plt.subplots(n_rows, n_cols, figsize=figsize)
 
@@ -57,5 +75,11 @@ class PlotPatches:
         for ax in axes[len(self.shapes):]:
             ax.axis("off")
 
-        plt.tight_layout()
-        return fig, axes
+        fig.tight_layout()
+
+        fig.savefig(
+            os.path.join(self.save_dir, "patches.png"),
+            dpi=200
+        )
+
+        plt.close(fig)

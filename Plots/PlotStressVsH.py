@@ -1,4 +1,6 @@
+import os
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 
 class PlotStressVsH:
@@ -10,6 +12,7 @@ class PlotStressVsH:
         stress_values_list,
         labels=None
     ):
+
         if not (
             len(shapes) ==
             len(h_values_list) ==
@@ -29,6 +32,19 @@ class PlotStressVsH:
         else:
             self.labels = labels
 
+        base_dir = "figs"
+        os.makedirs(base_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        class_name = self.__class__.__name__.lower()
+
+        self.save_dir = os.path.join(
+            base_dir,
+            f"{class_name}_{timestamp}"
+        )
+
+        os.makedirs(self.save_dir, exist_ok=True)
+
     def plot(self, figsize=(7, 5), marker="o"):
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -36,9 +52,11 @@ class PlotStressVsH:
         cmap = plt.cm.get_cmap("tab10")
 
         for i, (h_vals, stress_vals, label) in enumerate(
-            zip(self.h_values_list,
+            zip(
+                self.h_values_list,
                 self.stress_values_list,
-                self.labels)
+                self.labels
+            )
         ):
             color = cmap(i)
 
@@ -51,10 +69,16 @@ class PlotStressVsH:
             )
 
         ax.set_xlabel("h")
-        ax.set_ylabel("S-Stress")
+        ax.set_ylabel("Normalized S-Stress")
         ax.set_title("Stress vs h")
         ax.legend()
         ax.grid(True)
 
-        plt.tight_layout()
-        return fig, ax
+        fig.tight_layout()
+
+        fig.savefig(
+            os.path.join(self.save_dir, "stress_vs_h.png"),
+            dpi=200
+        )
+
+        plt.close(fig)
