@@ -18,7 +18,7 @@ from Algorithms.mdsmapp import (
 
 def main():
 
-    base = HollowRectangle(nx=60, ny=60, inner_margin_x=25, inner_margin_y=26, jitter=0.5, seed=1)
+    base = HollowRectangle(nx=60, ny=60, inner_margin_x=18, inner_margin_y=22, jitter=0.5, seed=1)
     # base = Rectangle(nx=60, ny=60, jitter=0.5, seed=0)
     s = SManifoldShape(base_shape=base, alpha=4.75)
     # s = SwissRollShape(base, alpha=10, seed=42)
