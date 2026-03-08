@@ -6,7 +6,7 @@ from datetime import datetime
 
 class PlotPatches:
 
-    def __init__(self, shapes, patches, centers, grid=(1, 1)):
+    def __init__(self, shapes, patches, centers, grid=(1, 1), save_name="patches"):
 
         if not (len(shapes) == len(patches) == len(centers)):
             raise ValueError("Shapes, patches, and centers must have same length.")
@@ -24,11 +24,10 @@ class PlotPatches:
         os.makedirs(base_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        class_name = self.__class__.__name__.lower()
 
         self.save_dir = os.path.join(
             base_dir,
-            f"{class_name}_{timestamp}"
+            f"{save_name}_{timestamp}"
         )
 
         os.makedirs(self.save_dir, exist_ok=True)

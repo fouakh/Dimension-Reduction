@@ -304,3 +304,38 @@ def compute_s_stress(
             stress = stress / denom
 
     return stress
+
+
+def compute_real_s_stress(
+    A: csr_matrix,
+    X_emb: np.ndarray,
+    normalized: bool = True
+) -> float:
+
+    rows, cols = A.nonzero()
+    weights = A.data
+
+    stress = 0.0
+    denom = 0.0
+
+    for k in range(len(weights)):
+
+        i = rows[k]
+        j = cols[k]
+
+        if i >= j:
+            continue
+
+        delta = weights[k]
+        delta2 = delta ** 2
+
+        diff = X_emb[i] - X_emb[j]
+        d_hat2 = np.dot(diff, diff)
+
+        stress += (delta2 - d_hat2) ** 2
+        denom += delta2 ** 2
+
+    if normalized and denom > 0:
+        stress /= denom
+
+    return stress

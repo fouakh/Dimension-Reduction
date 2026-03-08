@@ -10,7 +10,8 @@ class PlotStressVsH:
         shapes,
         h_values_list,
         stress_values_list,
-        labels=None
+        labels=None,
+        self_name="stress_vs_h"
     ):
 
         if not (
@@ -36,11 +37,10 @@ class PlotStressVsH:
         os.makedirs(base_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        class_name = self.__class__.__name__.lower()
 
         self.save_dir = os.path.join(
             base_dir,
-            f"{class_name}_{timestamp}"
+            f"{self_name}_{timestamp}"
         )
 
         os.makedirs(self.save_dir, exist_ok=True)

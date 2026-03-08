@@ -6,18 +6,17 @@ from datetime import datetime
 
 class PlotMDSMAPPDebug:
 
-    def __init__(self, X_background: np.ndarray):
+    def __init__(self, X_background: np.ndarray, save_name="mdsmapp_debug"):
         self.X_background = X_background
 
         base_dir = "figs"
         os.makedirs(base_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        class_name = self.__class__.__name__.lower()
 
         self.save_dir = os.path.join(
             base_dir,
-            f"{class_name}_{timestamp}"
+            f"{save_name}_{timestamp}"
         )
 
         os.makedirs(self.save_dir, exist_ok=True)
@@ -27,13 +26,18 @@ class PlotMDSMAPPDebug:
     def _save(self, fig, name: str):
         fig.savefig(
             os.path.join(self.save_dir, f"{self.step:03d}_{name}.png"),
-            dpi=200
+            dpi=200,
+            bbox_inches="tight",
+            pad_inches=0.02
         )
         plt.close(fig)
         self.step += 1
 
-    def _base_ax(self):
-        fig, ax = plt.subplots()
+
+    def _base_ax(self, margin_ratio=1.2, shift=(-13.0, -15.0)):
+
+        fig, ax = plt.subplots(figsize=(6, 6))
+
         ax.scatter(
             self.X_background[:, 0],
             self.X_background[:, 1],
@@ -41,8 +45,38 @@ class PlotMDSMAPPDebug:
             alpha=0.35,
             s=10
         )
-        ax.set_aspect("equal")
-        ax.axis("off")
+
+        x_min, x_max = self.X_background[:, 0].min(), self.X_background[:, 0].max()
+        y_min, y_max = self.X_background[:, 1].min(), self.X_background[:, 1].max()
+
+        x_center = 0.5 * (x_min + x_max)
+        y_center = 0.5 * (y_min + y_max)
+
+        dx, dy = shift
+        x_center += dx
+        y_center += dy
+
+        base_radius = max(x_max - x_min, y_max - y_min) * 0.5
+        radius = base_radius * (1 + margin_ratio)
+
+        ax.set_xlim(x_center - radius, x_center + radius)
+        ax.set_ylim(y_center - radius, y_center + radius)
+
+        ax.set_aspect("equal", adjustable="box")
+
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        fig.subplots_adjust(
+            left=0,
+            right=1,
+            bottom=0,
+            top=1
+        )
+
         return fig, ax
 
     def first_patch(self, patch_nodes):

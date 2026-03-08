@@ -6,7 +6,7 @@ from datetime import datetime
 
 class PlotDistanceError:
 
-    def __init__(self, shapes, D_true_list, D_hat_list, grid=(1, 1)):
+    def __init__(self, shapes, D_true_list, D_hat_list, grid=(1, 1), save_name="distance_error"):
 
         if len(shapes) != len(D_true_list) or len(shapes) != len(D_hat_list):
             raise ValueError("Shapes and distance lists must have same length.")
@@ -24,11 +24,10 @@ class PlotDistanceError:
         os.makedirs(base_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        class_name = self.__class__.__name__.lower()
 
         self.save_dir = os.path.join(
             base_dir,
-            f"{class_name}_{timestamp}"
+            f"{save_name}_{timestamp}"
         )
 
         os.makedirs(self.save_dir, exist_ok=True)

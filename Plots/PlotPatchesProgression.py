@@ -7,7 +7,7 @@ from datetime import datetime
 
 class PlotPatchesProgression:
 
-    def __init__(self, shapes, ordered_centers_list, patches_list, grid=(1, 1)):
+    def __init__(self, shapes, ordered_centers_list, patches_list, grid=(1, 1), save_name="patches_progression"):
 
         self.shapes = shapes
         self.ordered_centers_list = ordered_centers_list
@@ -18,11 +18,10 @@ class PlotPatchesProgression:
         os.makedirs(base_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        class_name = self.__class__.__name__.lower()
 
         self.save_dir = os.path.join(
             base_dir,
-            f"{class_name}_{timestamp}"
+            f"{save_name}_{timestamp}"
         )
 
         os.makedirs(self.save_dir, exist_ok=True)
