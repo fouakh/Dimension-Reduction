@@ -53,12 +53,12 @@ def main() -> None:
         ax.semilogy(h_values, real_stress_values,
                     color=c["real"], linewidth=2,
                     marker="o", markersize=6,
-                    label="Observed s-stress $\\mathcal{S}(Y_h)$")
+                    label="S-stress $\\mathcal{S}(Y_h)$")
 
         ax.semilogy(h_values, obs_stress_values,
                     color=c["obs"], linewidth=2,
                     linestyle="--", marker="s", markersize=6,
-                    label="Real s-stress $\\mathcal{S}^*(Y_h)$")
+                    label="Error $\\mathbf{E}(Y_h)$")
 
         ax.set_xlabel("Number of hops $h$", fontsize=12)
         ax.set_ylabel("S-stress (log scale)", fontsize=12)
@@ -66,7 +66,7 @@ def main() -> None:
         ax.legend(fontsize=10)
         ax.grid(True, which="both", alpha=0.3)
 
-    plt.suptitle("Real vs Observed S-stress", fontsize=14)
+    plt.suptitle("Error vs S-stress", fontsize=14)
     plt.tight_layout()
     plt.savefig("stress_comparison.png", dpi=150)
     plt.show()
